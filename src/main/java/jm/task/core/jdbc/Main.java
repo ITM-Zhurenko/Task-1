@@ -1,13 +1,12 @@
 package jm.task.core.jdbc;
 
 import jm.task.core.jdbc.model.User;
+import jm.task.core.jdbc.service.UserService;
 import jm.task.core.jdbc.service.UserServiceImpl;
-import jm.task.core.jdbc.util.Util;
 import org.apache.log4j.BasicConfigurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.sql.SQLException;
 import java.util.List;
 
 
@@ -17,7 +16,7 @@ public class Main {
 
     public static void main(String[] args) {
         BasicConfigurator.configure();
-        UserServiceImpl userService = new UserServiceImpl();
+        final UserService userService = new UserServiceImpl();
         userService.createUsersTable();
         for (int i = 0; i < USERS_COUNT; i++) {
             final User user = new User("A" + i, "B", (byte) 30);
@@ -28,12 +27,5 @@ public class Main {
         users.forEach(user -> logger.info(String.format(user.toString())));
         userService.cleanUsersTable();
         userService.dropUsersTable();
-
-        try {
-            Util.getConnection().close();
-            Util.getSessionFactory().close();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
     }
 }
