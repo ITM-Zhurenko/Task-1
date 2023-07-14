@@ -19,8 +19,9 @@ public class UserDaoHibernateImpl implements UserDao {
 
     @Override
     public void createUsersTable() {
+        Transaction transaction = null;
         try (Session session = Util.getSessionFactory().openSession()) {
-            final Transaction transaction = session.beginTransaction();
+            transaction = session.beginTransaction();
             final String createQuery = """
                     DROP TABLE IF EXISTS users;
                     create table users
@@ -37,37 +38,49 @@ public class UserDaoHibernateImpl implements UserDao {
             session.createSQLQuery(createQuery).executeUpdate();
             transaction.commit();
         } catch (HibernateException e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
             logger.error(e.getMessage());
         }
     }
 
     @Override
     public void dropUsersTable() {
+        Transaction transaction = null;
         try (Session session = Util.getSessionFactory().openSession()) {
-            final Transaction transaction = session.beginTransaction();
+            transaction = session.beginTransaction();
             session.createSQLQuery("DROP TABLE IF EXISTS users").executeUpdate();
             transaction.commit();
         } catch (HibernateException e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
             logger.error(e.getMessage());
         }
     }
 
     @Override
     public void saveUser(String name, String lastName, byte age) {
+        Transaction transaction = null;
         try (Session session = Util.getSessionFactory().openSession()) {
-            final Transaction transaction = session.beginTransaction();
+            transaction = session.beginTransaction();
             final User user = new User(name, lastName, age);
             session.save(user);
             transaction.commit();
         } catch (HibernateException e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
             logger.error(e.getMessage());
         }
     }
 
     @Override
     public void removeUserById(long id) {
+        Transaction transaction = null;
         try (Session session = Util.getSessionFactory().openSession()) {
-            final Transaction transaction = session.beginTransaction();
+            transaction = session.beginTransaction();
 
             final String deleteQuery = "DELETE FROM users WHERE id = :userId";
             session.createNativeQuery(deleteQuery)
@@ -76,20 +89,27 @@ public class UserDaoHibernateImpl implements UserDao {
 
             transaction.commit();
         } catch (HibernateException e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
             logger.error(e.getMessage());
         }
     }
 
     @Override
     public List<User> getAllUsers() {
+        Transaction transaction = null;
         try (Session session = Util.getSessionFactory().openSession()) {
-            final Transaction transaction = session.beginTransaction();
+            transaction = session.beginTransaction();
 
             final List<User> users = session.createNativeQuery("SELECT * FROM users", User.class).getResultList();
 
             transaction.commit();
             return users;
         } catch (HibernateException e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
             logger.error(e.getMessage());
             return null;
         }
@@ -97,13 +117,17 @@ public class UserDaoHibernateImpl implements UserDao {
 
     @Override
     public void cleanUsersTable() {
+        Transaction transaction = null;
         try (Session session = Util.getSessionFactory().openSession()) {
-            final Transaction transaction = session.beginTransaction();
+            transaction = session.beginTransaction();
 
             session.createSQLQuery("TRUNCATE TABLE users").executeUpdate();
 
             transaction.commit();
         } catch (HibernateException e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
             logger.error(e.getMessage());
         }
     }
