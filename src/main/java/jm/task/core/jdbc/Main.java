@@ -19,9 +19,8 @@ public class Main {
         final UserService userService = new UserServiceImpl();
         userService.createUsersTable();
         for (int i = 0; i < USERS_COUNT; i++) {
-            final User user = new User("A" + i, "B", (byte) 30);
-            userService.saveUser(user.getName(), user.getLastName(), user.getAge());
-            logger.info(String.format("User: %s was added", user.getName()));
+            userService.saveUser("A" + i, "B" + i, (byte) (30 + i));
+            logger.info(String.format("User: %s was added", "A" + i));
         }
         final List<User> users = userService.getAllUsers();
         users.forEach(user -> logger.info(String.format(user.toString())));
